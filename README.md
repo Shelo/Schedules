@@ -1,0 +1,2 @@
+# Schedules
+Schedules django application.
