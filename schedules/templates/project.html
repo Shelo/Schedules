@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load blocks_extras %}
+{% load staticfiles %}
+
+{% block head_extra %}
+    <link rel="stylesheet" href="{% static "css/schedules.css" %}"/>
+{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="large-12 columns">
+            <h3>{{ project.name }}</h3>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="large-8 columns">
+            <table width="100%" class="schedules-select">
+                <thead>
+                    <tr>
+                        <th class="text-center">B</th>
+                        <th class="text-center">Monday</th>
+                        <th class="text-center">Tuesday</th>
+                        <th class="text-center">Wednesday</th>
+                        <th class="text-center">Thursday</th>
+                        <th class="text-center">Friday</th>
+                        <th class="text-center">Saturday</th>
+                        <th class="text-center">Sunday</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for i in block_loops %}
+                    <tr>
+                        <td class="text-center">{{ i }}</td>
+
+                        {% for j in day_loops %}
+                            <td class="schedules-block">
+                                <div class="schedules-block-overlay"
+                                     style="width: {{ blocks|day:j|block:i|length|block_percentage:total }}%">
+                                </div>
+
+                                <div class="schedules-block-info">
+                                    {{ blocks|day:j|block:i|length }} / {{ total }}
+                                </div>
+                            </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="large-4 columns">
+            <div class="panel">
+                <h4>Project info</h4>
+
+                <p style="font-style: italic" class="text-justify">
+                    {{ project.short_description }}
+                </p>
+
+                <ul class="no-bullet">
+                    <li>Owner: {{ project.owner.get_full_name }}</li>
+                    <li>Created: {{ project.create_time|date:"d, M Y" }}</li>
+                    <li>Members: {{ project.membership_set.all|length }}</li>
+                </ul>
+            </div>
+
+            <div class="panel text-center">
+                <a href="{% url "schedules.views.submit_schedule" project.slug %}">Submit Schedule</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

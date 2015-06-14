@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block body %}
+    <div class="row">
+        <div class="large-12 columns">
+            <h3>Create project</h3>
+        </div>
+
+        <div class="row">
+            <div class="large-12 columns">
+                <form action="{% url "schedules.views.submit_project" %}" method="post" class="panel">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="large-12 columns">
+                            <input type="text" name="name" placeholder="name" required/>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="large-12 columns">
+                            <input type="text" name="short_description" placeholder="short description" required/>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="large-12 columns">
+                            <input type="text" name="users" placeholder="invite, users, by, comma" />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="large-12 columns">
+                            <button class="right">Create</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

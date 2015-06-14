@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block body %}
+    <div class="row">
+        <div class="large-8 columns">
+            <div class="panel">
+                <h3>All projects</h3>
+
+                <ul class="no-bullet">
+                    {% for project in projects %}
+                        <li><a href="{% url 'project' project.slug %}">{{ project.name }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <div class="large-4 columns">
+            <div class="panel">
+                <h3>Projects you own</h3>
+
+                <ul class="no-bullet">
+                    {% for project in projects_own %}
+                        <li><a href="{% url 'project' project.slug %}">{{ project.name }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+{% endblock %}

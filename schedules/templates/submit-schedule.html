@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load blocks_extras %}
+{% load staticfiles %}
+
+{% block head_extra %}
+    <link rel="stylesheet" href="{% static "css/schedules.css" %}"/>
+{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="large-12 columns">
+            <h3>Project {{ project.name }}</h3>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="large-12 columns">
+            <h5>Select occupied blocks</h5>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="large-8 large-centered columns">
+            <table width="100%" class="schedules-select">
+                <thead>
+                    <tr>
+                        <th class="text-center">B</th>
+                        <th class="text-center">Monday</th>
+                        <th class="text-center">Tuesday</th>
+                        <th class="text-center">Wednesday</th>
+                        <th class="text-center">Thursday</th>
+                        <th class="text-center">Friday</th>
+                        <th class="text-center">Saturday</th>
+                        <th class="text-center">Sunday</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for i in block_loops %}
+                    <tr>
+                        <td class="text-center schedules-block-row">{{ i }}</td>
+
+                        {% for j in day_loops %}
+                            <td class="schedules-block">
+
+                            </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts_extra %}
+    <script src="{% static "js/schedules.js" %}"></script>
+{% endblock %}

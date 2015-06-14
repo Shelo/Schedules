@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html>
+<head>
+    <title>Schedules</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" href="{% static 'css/foundation.css' %}"/>
+    <script src="{% static 'js/vendor/modernizr.js' %}"></script>
+    {% block head_extra %}
+    {% endblock %}
+</head>
+
+<body>
+    <div class="contain-to-grid fixed">
+        <nav class="top-bar" data-topbar role="navigation">
+            <ul class="title-area">
+                <li class="name">
+                    <h1><a href="{% url "schedules.views.home" %}">SCHEDULES</a></h1>
+                </li>
+                <li class="toggle-topbar menu-icon"><a href="#"><span>Menu</span></a></li>
+            </ul>
+
+            <section class="top-bar-section">
+                {% if user.is_authenticated %}
+                    <ul class="right">
+                        <li class="active"><a href="{% url "schedules.views.create_project" %}">Create Project</a></li>
+
+                        <li class="has-dropdown">
+                            <a href="#">{{ user.get_full_name }}</a>
+
+                            <ul class="dropdown">
+                                <li><a href="#">Edit schedule templates</a></li>
+                                <li class="active"><a href="{% url "logout" %}">Disconnect</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                {% endif %}
+
+                <ul class="left">
+                    <li><a href="{% url "schedules.views.home" %}">Home</a></li>
+                </ul>
+            </section>
+        </nav>
+    </div>
+
+    <div style="height: 30px">
+    </div>
+
+    {% block body %}
+    {% endblock %}
+
+    <script src="{% static 'js/vendor/jquery.js' %}"></script>
+    <script src="{% static 'js/foundation/foundation.js' %}"></script>
+    <script src="{% static 'js/foundation/foundation.alert.js' %}"></script>
+    <script src="{% static 'js/foundation/foundation.topbar.js' %}"></script>
+
+    <script>
+        $(document).foundation();
+    </script>
+
+    {% block scripts_extra %}
+    {% endblock %}
+</body>
+</html>
