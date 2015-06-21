@@ -25,6 +25,9 @@ class Membership(models.Model):
     project = models.ForeignKey(Project)
     create_time = models.DateTimeField(auto_now_add=True, auto_now=False)
 
+    class Meta:
+        unique_together = ['user', 'project']
+
     def __str__(self):
         return "%s @ %s" % (self.user, self.project.name)
 

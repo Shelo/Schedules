@@ -3,7 +3,19 @@
 {% load staticfiles %}
 
 {% block head_extra %}
-    <link rel="stylesheet" href="{% static "css/schedules.css" %}"/>
+    <link rel="stylesheet" href="{% static "css/project.css" %}"/>
+
+    <style>
+        .ui-helper-hidden-accessible
+        {
+            display:none
+        }
+
+        .ui-autocomplete
+        {
+            z-index: 9999;
+        }
+    </style>
 {% endblock %}
 
 {% block body %}
@@ -15,6 +27,10 @@
 
     <div class="row">
         <div class="large-8 columns">
+            <div class="panel">
+                Put your mouse over blocks to see which user has that block available.
+            </div>
+
             <table width="100%" class="schedules-select">
                 <thead>
                     <tr>
@@ -35,13 +51,26 @@
                         <td class="text-center">{{ i }}</td>
 
                         {% for j in day_loops %}
-                            <td class="schedules-block">
+                            <td class="schedules-block has-tip"
+                                data-tooltip
+                                aria-haspopup="true"
+                                title="{% if blocks|day:j|existblock:i %}
+                                    {{ blocks|day:j|block:i|tooltip }}
+                                {% else %}
+                                    {{ all_members|join:', ' }}
+                                {% endif %}">
+
                                 <div class="schedules-block-overlay"
-                                     style="width: {{ blocks|day:j|block:i|length|block_percentage:total }}%">
+                                     style="width: {{ blocks|day:j|rawblock:i|percentage:total }}%">
                                 </div>
 
                                 <div class="schedules-block-info">
-                                    {{ blocks|day:j|block:i|length }} / {{ total }}
+                                    {% if blocks|day:j|existblock:i %}
+                                        {{ blocks|day:j|block:i|length }} / {{ total }}
+                                    {% else %}
+                                        {{ total }} / {{ total }}
+                                    {% endif %}
+
                                 </div>
                             </td>
                         {% endfor %}
@@ -49,10 +78,48 @@
                     {% endfor %}
                 </tbody>
             </table>
+
+            {% if is_owner %}
+                <div class="panel">
+                    <h4>Administration</h4>
+                </div>
+
+                <div class="row">
+                    <div class="large-4 columns">
+                        <a href="#" class="panel columns callout radius" data-reveal-id="add-users">
+                            <i class="fi-plus"></i> Add members
+                        </a>
+                    </div>
+
+                    <div class="large-4 columns">
+                        <a id="remove-members" class="panel columns radius callout" data-reveal-id="remove-users">
+                            <i class="fi-x"></i> Remove members
+                        </a>
+                    </div>
+
+                    <div class="large-4 columns">
+                        <a class="panel columns radius callout">
+                            <i class="fi-loop"></i> Clear data
+                        </a>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="large-4 columns">
+                        <a class="panel columns radius callout">
+                            <i class="fi-power"></i> Delete project
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
         </div>
 
         <div class="large-4 columns">
-            <div class="panel">
+            <div class="panel text-center radius">
+                <a href="{% url "schedules.views.submit_schedule" project.slug %}">Submit Schedule</a>
+            </div>
+
+            <div class="panel radius">
                 <h4>Project info</h4>
 
                 <p style="font-style: italic" class="text-justify">
@@ -64,11 +131,85 @@
                     <li>Created: {{ project.create_time|date:"d, M Y" }}</li>
                     <li>Members: {{ project.membership_set.all|length }}</li>
                 </ul>
-            </div>
 
-            <div class="panel text-center">
-                <a href="{% url "schedules.views.submit_schedule" project.slug %}">Submit Schedule</a>
+                <h5>Members:</h5>
+                <ul>
+                    {% for member in all_members %}
+                        <li>{{ member }}</li>
+                    {% endfor %}
+                </ul>
             </div>
         </div>
     </div>
+
+    <div id="add-users" class="reveal-modal tiny" data-reveal aria-labelledby="title" aria-hidden="true" role="dialog">
+        <h2 id="title">Add users</h2>
+
+        <div class="row collapse">
+            <div class="large-10 columns ui-widget">
+                <input id="users" type="text" placeholder="Search for username, full name or email to add them.">
+            </div>
+
+            <div class="large-2 columns">
+                <a id="submit-new-user" class="postfix">Add</a>
+            </div>
+        </div>
+
+        <div id="add-users-messages"></div>
+
+        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+    </div>
+
+    <div id="remove-users" class="reveal-modal small" data-reveal aria-labelledby="title" aria-hidden="true"
+         role="dialog">
+
+        <h2 id="title">Remove users</h2>
+
+        <table width="100%">
+            <thead>
+                <tr>
+                    <th width="100">Username</th>
+                    <th>Fullname</th>
+                    <th width="20"></th>
+                </tr>
+            </thead>
+
+            <tbody id="remove-members-container">
+            </tbody>
+        </table>
+
+        <div id="remove-members-retrieving" class="expand text-center">Retrieving member list.</div>
+
+        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+    </div>
+{% endblock %}
+
+{% block scripts_extra %}
+    <script src="{% static 'js/foundation/foundation.tooltip.js' %}"></script>
+    <script src="{% static 'js/jquery-ui.js' %}"></script>
+    <script src="{% static 'js/add-user.js' %}"></script>
+    <script src="{% static 'js/show-members.js' %}"></script>
+
+    <script>
+    $(function() {
+        $("#users").autocomplete({
+            source: "{% url 'schedules.views.query_users' %}"
+        });
+    });
+
+    $(document).ready(function()
+    {
+        $('.ui-autocomplete').addClass('f-dropdown');
+        $('#submit-new-user').click(function()
+        {
+            submitNewUser("{% url 'schedules.views.add_member' project.slug %}/", "{{ csrf_token }}");
+        });
+    });
+
+    $('#remove-members').click(function()
+    {
+        displayMembers("{% url 'schedules.views.query_project_members' project.slug %}",
+            "{% url 'schedules.views.query_remove_member' project.slug %}", "{{ csrf_token }}");
+    });
+    </script>
 {% endblock %}

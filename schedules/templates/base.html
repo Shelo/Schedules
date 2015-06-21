@@ -5,6 +5,8 @@
     <title>Schedules</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <link rel="stylesheet" href="{% static 'css/foundation.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/schedules.css' %}"/>
+    <link rel="stylesheet" href="{% static 'icons/foundation-icons.css' %}" />
     <script src="{% static 'js/vendor/modernizr.js' %}"></script>
     {% block head_extra %}
     {% endblock %}
@@ -23,7 +25,7 @@
             <section class="top-bar-section">
                 {% if user.is_authenticated %}
                     <ul class="right">
-                        <li class="active"><a href="{% url "schedules.views.create_project" %}">Create Project</a></li>
+                        <li class="active"><a href="#" data-reveal-id="create-project">Create Project</a></li>
 
                         <li class="has-dropdown">
                             <a href="#">{{ user.get_full_name }}</a>
@@ -43,22 +45,36 @@
         </nav>
     </div>
 
-    <div style="height: 30px">
+    <div style="height: 10px">
     </div>
 
     {% block body %}
     {% endblock %}
 
+    <div id="create-project" class="reveal-modal" data-reveal aria-labelledby="title" aria-hidden="true" role="dialog">
+        <h2 id="title">Create a project</h2>
+
+        <form action="{% url 'schedules.views.create_project' %}" method="post">
+            {% csrf_token %}
+            <input type="text" name="name" placeholder="project's name" required />
+            <input type="text" name="short_description" placeholder="short description" required />
+            <button class="right">Create</button>
+        </form>
+
+        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+    </div>
+
     <script src="{% static 'js/vendor/jquery.js' %}"></script>
     <script src="{% static 'js/foundation/foundation.js' %}"></script>
     <script src="{% static 'js/foundation/foundation.alert.js' %}"></script>
     <script src="{% static 'js/foundation/foundation.topbar.js' %}"></script>
+    <script src="{% static 'js/foundation/foundation.reveal.js' %}"></script>
+
+    {% block scripts_extra %}
+    {% endblock %}
 
     <script>
         $(document).foundation();
     </script>
-
-    {% block scripts_extra %}
-    {% endblock %}
 </body>
 </html>
